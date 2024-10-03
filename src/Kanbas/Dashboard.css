@@ -1,0 +1,81 @@
+#wd-dashboard {
+    padding: 20px;
+    background-color: #f9f9f9;
+}
+
+/* 标题和子标题样式 */
+#wd-dashboard-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+#wd-dashboard-published {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* 卡片的宽度和间距控制 */
+.wd-dashboard-course {
+    width: 260px; /* 固定宽度在 250-270 之间 */
+    margin-bottom: 30px; /* 控制课程之间的白色间距 */
+}
+
+/* 让卡片的高度自适应，确保按钮位置一致 */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* 固定图片高度，确保每个卡片图片大小一致 */
+.card-img-top {
+    height: 150px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* 卡片主体的内容部分 */
+.card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 确保按钮位于卡片底部 */
+    min-height: 200px; /* 根据需要调整，确保卡片的最小高度一致 */
+}
+
+/* 确保按钮固定在卡片底部 */
+.btn {
+    align-self: flex-end;
+    margin-top: auto; /* 确保按钮推到卡片的底部 */
+}
+
+/* 课程卡片中的文字 */
+.wd-dashboard-course-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+/* 确保 Kanbas 的侧边栏与课程有间距 */
+#wd-dashboard-course {
+    margin-left: 20px; /* 保证课程和侧边栏之间有足够的白边距 */
+}
+
+/* 响应式布局 */
+@media (max-width: 1200px) {
+    .row-cols-md-4 .wd-dashboard-course {
+        max-width: 33.333%; /* 最多 3 列 */
+    }
+}
+
+@media (max-width: 768px) {
+    .row-cols-md-4 .wd-dashboard-course {
+        max-width: 50%; /* 最多 2 列 */
+    }
+}
+
+@media (max-width: 576px) {
+    .row-cols-md-4 .wd-dashboard-course {
+        max-width: 100%; /* 最多 1 列 */
+    }
+}

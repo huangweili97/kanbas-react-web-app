@@ -1,0 +1,80 @@
+/* 设置 body 样式 */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* 全局字体 */
+body * {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 调整宽屏样式 */
+@media (min-width: 768px) {
+  #wd-kanbas .wd-main-content-offset {
+    padding-left: 140px !important;
+  }
+}
+
+/* 默认状态下 wd-courses-navigation 的链接字体为红色 */
+#wd-courses-navigation .list-group-item {
+  color: red; /* 默认状态下，字体为红色 */
+}
+
+/* 当链接被激活时 (active)，字体变为黑色 */
+#wd-courses-navigation .list-group-item.active {
+  color: black !important; /* 点击时字体变为黑色 */
+  background-color: white;
+  border-left: 3px solid black !important;
+}
+
+/* 默认状态下 wd-account-navigation 的链接字体为红色 */
+#wd-account-navigation .list-group-item {
+  color: red; /* 默认状态下，字体为红色 */
+  text-decoration: none; /* 去掉下划线 */
+}
+
+/* 当链接被激活时 (active)，字体变为黑色 */
+#wd-account-navigation .list-group-item.active {
+  color: black !important; /* 点击时字体变为黑色 */
+  background-color: white;
+  border-left: 3px solid black !important;
+}
+
+/* 全局样式：其他地方的 list-group-item 字体为黑色 */
+body .list-group-item {
+  color: black;
+}
+
+.btn-secondary {
+  --bs-btn-color: #000 !important;
+  --bs-btn-bg: #c7cdd1 !important;
+  --bs-btn-border-color: #c7cdd1 !important;
+  --bs-btn-hover-color: #fff !important;
+}
+
+.bg-secondary {
+  --bs-secondary-rgb: 199, 205, 209;
+}
+
+/* wd-lesson 特定样式 */
+.wd-lesson {
+  border-left: 3px solid green !important;
+}
+
+
+/* 搜索框中的图标 */
+#wd-search-assignment {
+  padding-left: 2rem; /* 确保图标不会覆盖文字 */
+}
+
+/* 作业列表的链接样式 */
+.wd-assignment-link {
+  font-weight: bold;
+  color: black;
+  text-decoration: none;
+}
+
+.wd-assignment-link:hover {
+  text-decoration: underline;
+}

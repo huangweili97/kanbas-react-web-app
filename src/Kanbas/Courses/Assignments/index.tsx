@@ -1,62 +1,50 @@
+import React from "react";
+import SearchBar from "./SearchBar";
+import AssignmentButtons from "./AssignmentButtons";
+import AssignmentListItemA1 from "./AssignmentListItemA1";
+import AssignmentListItemA2 from "./AssignmentListItemA2";
+import AssignmentListItemA3 from "./AssignmentListItemA3";
+import { BsGripVertical } from "react-icons/bs"; // 8点图标
+import { IoEllipsisVertical } from "react-icons/io5"; // 右侧三个点的图标
+import { FaCaretDown } from "react-icons/fa"; // 黑色倒三角图标
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../../styles.css"; // Assuming shared styles
+import { MdPortableWifiOff } from "react-icons/md";
+
 export default function Assignments() {
     return (
-        <div id="wd-assignments">
-            <input 
-                id="wd-search-assignment" 
-                placeholder="Search for Assignments" 
-            />
-            <button id="wd-add-assignment-group">+ Group</button>
-            <button id="wd-add-assignment">+ Assignment</button>
+        <div id="wd-assignments" className="p-3">
+            {/* 搜索框部分 */}
+            <SearchBar />
 
-            <h3 id="wd-assignments-title">
-                ASSIGNMENTS 40% of Total <button>+</button>
-            </h3>
+            {/* 按钮部分 */}
+            <AssignmentButtons />
 
-            <ul id="wd-assignment-list">
-                {/* Assignment 1 */}
-                <li className="wd-assignment-list-item">
-                    <a 
-                        className="wd-assignment-link"
-                        href="#/Kanbas/Courses/1234/Assignments/123">
-                        A1 - ENV + HTML
-                    </a>
-                    <p>
-                        Multiple Modules | <strong>Not available until</strong> May 6 at 12:00am
-                    </p>
-                    <p>
-                        <strong>Due</strong> May 13 at 11:59pm | 100pts
-                    </p>
-                </li>
+            {/* 作业标题 */}
+            <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center">
+                {/* 左侧的8点图标 */}
+                <BsGripVertical className="me-2 fs-3" />
+                
+                {/* ASSIGNMENTS 标题左边的黑色倒三角图标 */}
+                <FaCaretDown className="me-2 fs-4" />
+                
+                <h3 className="me-auto mb-0">ASSIGNMENTS</h3>
 
-                {/* Assignment 2 */}
-                <li className="wd-assignment-list-item">
-                    <a 
-                        className="wd-assignment-link"
-                        href="#/Kanbas/Courses/1234/Assignments/124">
-                        A2 - CSS + BOOTSTRAP
-                    </a>
-                    <p>
-                        Multiple Modules | <strong>Not available until</strong> May 13 at 12:00pm
-                    </p>
-                    <p>
-                        <strong>Due</strong> May 20 at 11:59pm | 100pts
-                    </p>
-                </li>
+                {/* 右侧的按钮和图标 */}
+                <button className="btn btn-sm btn-light rounded-pill me-2">
+                    40% of Total
+                </button>
+                <button className="btn btn-sm btn-light me-2">
+                    +
+                </button>
+                <IoEllipsisVertical className="fs-4 ms-2" />
+            </div>
 
-                {/* Assignment 3 */}
-                <li className="wd-assignment-list-item">
-                    <a 
-                        className="wd-assignment-link"
-                        href="#/Kanbas/Courses/1234/Assignments/125">
-                        A3 - JAVASCRIPT + REACT
-                    </a>
-                    <p>
-                        Multiple Modules | <strong>Not available until</strong> May 20 at 12:00pm
-                    </p>
-                    <p>
-                        <strong>Due</strong> May 27 at 11:59pm | 100pts
-                    </p>
-                </li>
+            {/* 作业列表 */}
+            <ul id="wd-assignment-list" className="list-group">
+                <AssignmentListItemA1 />
+                <AssignmentListItemA2 />
+                <AssignmentListItemA3 />
             </ul>
         </div>
     );
