@@ -50,9 +50,15 @@
     margin-top: auto; /* 确保按钮推到卡片的底部 */
 }
 
-/* 课程卡片中的文字 */
+/* 课程卡片中的文字 标题 */
 .wd-dashboard-course-title {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    font-weight: bold; /* 加粗标题 */
+}
+/* 课程卡片中的文字 非标题 */
+.wd-dashboard-course-body {
+    font-size: 0.8rem;
     margin-bottom: 10px;
 }
 

@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import * as db from "../../Database";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-export default function AssignmentEditor() {
-  const [description, setDescription] = useState(
-    `The assignment is available online. Submit a link to the landing page of the project.
+// 定义 Assignment 的类型
+interface Assignment {
+  _id: string;
+  title: string;
+  course: string;
+}
+
+export default function Editor() {
+  const { aid } = useParams(); // 从 URL 中获取 aid
+  console.log(useParams());
+  const [assignment, setAssignment] = useState<Assignment | null>(null); // 处理 assignment 的状态
+  const [description, setDescription] = useState(""); // 本地描述状态管理
+
+  // 查找 assignment 并设置状态
+  useEffect(() => {
+    const foundAssignment = db.assignment.find((a) => a._id === aid);
+    if (foundAssignment) {
+      setAssignment(foundAssignment); // 设置 assignment 状态
+      setDescription(`The assignment is available online. Submit a link to the landing page of the project.
 This project involves a deep dive into environmental studies and HTML usage.
 Ensure that all materials are uploaded properly and that the work submitted is original.
-Please follow the guidelines as described in the syllabus.`
-  );
+Please follow the guidelines as described in the syllabus.`); // 设置默认描述
+    }
+  }, [aid]);
+
+  // 如果找不到 assignment，显示错误信息
+  if (!assignment) {
+    return <div>Assignment not found</div>;
+  }
 
   return (
     <div id="wd-assignments-editor" className="container mt-5">
@@ -18,11 +42,12 @@ Please follow the guidelines as described in the syllabus.`
           <label htmlFor="wd-name" className="form-label">Assignment Name</label>
         </div>
         <div className="col-sm-12">
-          <input id="wd-name" className="form-control" value="A1 - ENV + HTML" />
+          {/* 动态显示 assignment title */}
+          <input id="wd-name" className="form-control" value={assignment.title} readOnly />
         </div>
       </div>
 
-      {/* Description without label */}
+      {/* Description */}
       <div className="row mb-3">
         <div className="col-sm-12">
           <textarea 
@@ -38,8 +63,8 @@ Please follow the guidelines as described in the syllabus.`
       {/* Submission Type Section */}
       <div className="row mb-3">
         <div className="d-flex align-items-start w-100">
-          <label className="form-label fw-bold me-2" style={{ backgroundColor: 'white', padding: '0 5px' }}>Submission Type</label> {/* 标签紧贴框框 */}
-          <div className="p-3 border rounded flex-grow-1 w-100"> {/* 使用 w-100 确保宽度一致 */}
+          <label className="form-label fw-bold me-2" style={{ backgroundColor: 'white', padding: '0 5px' }}>Submission Type</label>
+          <div className="p-3 border rounded flex-grow-1 w-100">
             
             {/* Submission Type */}
             <div className="row mb-3">
@@ -54,7 +79,7 @@ Please follow the guidelines as described in the syllabus.`
             {/* Online Entry Options */}
             <div className="row mb-3">
               <div className="col-sm-12">
-                <label className="form-label fw-bold">Online Entry Options</label> {/* 字体加粗 */}
+                <label className="form-label fw-bold">Online Entry Options</label>
                 <div className="form-check">
                   <input type="checkbox" className="form-check-input" id="wd-text-entry" />
                   <label htmlFor="wd-text-entry" className="form-check-label">Text Entry</label>
@@ -84,13 +109,13 @@ Please follow the guidelines as described in the syllabus.`
       {/* Assign Section */}
       <div className="row mb-3">
         <div className="d-flex align-items-start w-100">
-          <label className="form-label fw-bold me-2" style={{ backgroundColor: 'white', padding: '0 5px' }}>Assign</label> {/* 标签紧贴框框 */}
-          <div className="p-3 border rounded flex-grow-1 w-100"> {/* 使用 w-100 确保宽度一致 */}
+          <label className="form-label fw-bold me-2" style={{ backgroundColor: 'white', padding: '0 5px' }}>Assign</label>
+          <div className="p-3 border rounded flex-grow-1 w-100">
             
             {/* Assign To */}
             <div className="row mb-3">
               <div className="col-sm-12">
-                <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label> {/* 字体加粗 */}
+                <label htmlFor="wd-assign-to" className="form-label fw-bold">Assign to</label>
                 <input id="wd-assign-to" className="form-control" value="Everyone" />
               </div>
             </div>
@@ -98,7 +123,7 @@ Please follow the guidelines as described in the syllabus.`
             {/* Due */}
             <div className="row mb-3">
               <div className="col-sm-12">
-                <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label> {/* 字体加粗 */}
+                <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label>
                 <input type="date" id="wd-due-date" className="form-control" value="2024-05-13" />
               </div>
             </div>
@@ -106,11 +131,11 @@ Please follow the guidelines as described in the syllabus.`
             {/* Available From and Until */}
             <div className="row mb-3">
               <div className="col-sm-6">
-                <label htmlFor="wd-available-from" className="form-label fw-bold">Available From</label> {/* 字体加粗 */}
+                <label htmlFor="wd-available-from" className="form-label fw-bold">Available From</label>
                 <input type="date" id="wd-available-from" className="form-control" value="2024-05-06" />
               </div>
               <div className="col-sm-6">
-                <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label> {/* 字体加粗 */}
+                <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label>
                 <input type="date" id="wd-available-until" className="form-control" value="2024-05-20" />
               </div>
             </div>
@@ -120,6 +145,7 @@ Please follow the guidelines as described in the syllabus.`
 
       <hr />
 
+      {/* Cancel 和 Save 按钮 */}
       <div className="d-flex justify-content-end">
         <button className="btn btn-secondary me-2">Cancel</button>
         <button className="btn btn-success">Save</button>
@@ -127,133 +153,3 @@ Please follow the guidelines as described in the syllabus.`
     </div>
   );
 }
-
-
-
-
-
-
-{/* // </div>export default function AssignmentEditor() {
-//     return (
-//         <div id="wd-assignments-editor">
-//             <label htmlFor="wd-name">Assignment Name</label>
-//             <input id="wd-name" value="A1 - ENV + HTML" /><br /><br />
-            
-//             <textarea id="wd-description">
-//                 The assignment is available online. Submit a link to the landing page of the project.
-//                 This project involves a deep dive into environmental studies and HTML usage.
-//                 Ensure that all materials are uploaded properly and that the work submitted is original.
-//                 Please follow the guidelines as described in the syllabus. Lorem ipsum dolor sit, amet consectetur
-//                 adipisicing elit. Quis et blanditiis minima, voluptas corrupti quod repudiandae nam assumenda 
-//                 ab labore numquam earum iusto unde tenetur architecto corporis magnam rerum magni.
-//             </textarea>
-//             <br /><br />
-            
-//             <table>
-//                 <tr>
-//                     <td align="right" valign="top">
-//                         <label htmlFor="wd-points">Points</label>
-//                     </td>
-//                     <td>
-//                         <input id="wd-points" value={100} />
-//                     </td>
-//                 </tr>
-//                 <br />
-//                 <tr>
-//                     <td align="right" valign="top">
-//                         <label htmlFor="wd-group">Assignment Group</label>
-//                     </td>
-//                     <td>
-//                         <select id="wd-group">
-//                             <option value="ASSIGNMENTS">ASSIGNMENTS</option>
-//                         </select>
-//                     </td>
-//                 </tr>
-//                 <br />
-//                 <tr>
-//                     <td align="right" valign="top">
-//                         <label htmlFor="wd-display-grade-as">Display Grade as</label>
-//                     </td>
-//                     <td>
-//                         <select id="wd-display-grade-as">
-//                             <option value="PERCENTAGE">Percentage</option>
-//                         </select>
-//                     </td>
-//                 </tr>
-//                 <br />
-//                 <tr>
-//                     <td align="right" valign="top">
-//                         <label htmlFor="wd-submission-type">Submission Type</label>
-//                     </td>
-//                     <td>
-//                         <select id="wd-submission-type">
-//                             <option value="ONLINE">Online</option>
-//                         </select>
-//                     </td>
-//                 </tr>
-                
-//                 <br />
-                
-//                 <tr>
-//                     <td colSpan={2}>
-//                         <label>Online Entry Options:</label><br />
-//                         <input type="checkbox" id="wd-text-entry" />
-//                         <label htmlFor="wd-text-entry">Text Entry</label><br />
-
-//                         <input type="checkbox" id="wd-website-url" />
-//                         <label htmlFor="wd-website-url">Website URL</label><br />
-
-//                         <input type="checkbox" id="wd-media-recordings" />
-//                         <label htmlFor="wd-media-recordings">Media Recordings</label><br />
-
-//                         <input type="checkbox" id="wd-student-annotation" />
-//                         <label htmlFor="wd-student-annotation">Student Annotation</label><br />
-
-//                         <input type="checkbox" id="wd-file-upload" />
-//                         <label htmlFor="wd-file-upload">File Uploads</label>
-//                     </td>
-//                 </tr>
-
-//                 <br />
-//                 <tr>
-//                     <td align="right" valign="top">
-//                         <label>Assign</label>
-//                     </td>
-//                     <td>
-//                         <table>
-//                             <tr>
-//                                 <td>
-//                                     <label htmlFor="wd-assign-to">Assign to</label><br />
-//                                     <input id="wd-assign-to" value="Everyone" />
-//                                 </td>
-//                             </tr>
-//                             <tr>
-//                                 <td>
-//                                     <label htmlFor="wd-due-date">Due</label><br />
-//                                     <input type="date" id="wd-due-date" value="2024-05-13" /><br />
-//                                 </td>
-//                             </tr>
-//                             <tr>
-//                                 <td>
-//                                     <label htmlFor="wd-available-from">Available From</label><br />
-//                                     <input type="date" id="wd-available-from" value="2024-05-06" />
-//                                 </td>
-//                                 <td>
-//                                     <label htmlFor="wd-available-until">Until</label><br />
-//                                     <input type="date" id="wd-available-until" value="2024-05-20" />
-//                                 </td>
-//                             </tr>
-//                         </table>
-//                     </td>
-//                 </tr>
-//             </table>
-            
-//             <hr />
-
-//             <div style={{ textAlign: 'right' }}>
-//                 <button>Cancel</button>
-//                 <button>Safe</button>
-//             </div>
-//         </div>
-//     );
-// } */}
