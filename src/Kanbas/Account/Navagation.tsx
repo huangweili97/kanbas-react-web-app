@@ -1,8 +1,13 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "../styles.css";
+import { useSelector } from "react-redux";
 
 export default function AccountNavigation() {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
+  const { pathname } = useLocation();
+
   // 使用 useState 来存储当前激活的链接
   const [activeLink, setActiveLink] = useState("/Kanbas/Account/Signin");
 

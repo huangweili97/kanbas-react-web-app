@@ -1,9 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { BsGripVertical } from "react-icons/bs"; // 8点图标
-import { IoEllipsisVertical } from "react-icons/io5"; // 右侧三个点的图标
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { deleteAssignment } from "./reducer";
+import { BsGripVertical } from "react-icons/bs"; // 左侧的 8 点图标
+import { IoEllipsisVertical } from "react-icons/io5"; // 右侧的操作图标
 import { FaClipboard } from "react-icons/fa"; // 绿色记事板图标
-import GreenCheckmark from "./GreenCheckmark"; // 引入绿色勾
+import GreenCheckmark from "./GreenCheckmark"; // 绿色勾图标
 
 // 定义 AssignmentListItem 组件的 Props 类型
 interface AssignmentListItemProps {
@@ -15,14 +17,26 @@ interface AssignmentListItemProps {
   cid: string;
 }
 
-export default function AssignmentListItem(props: AssignmentListItemProps) {
-  // 使用 const 代替解构赋值
-  const assignment = props.assignment;
-  const cid = props.cid;
+export default function AssignmentListItem({ assignment, cid }: AssignmentListItemProps) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleDelete = () => {
+    // 删除前的确认提示
+    const confirmed = window.confirm("Are you sure you want to delete this assignment?");
+    if (confirmed) {
+      dispatch(deleteAssignment(assignment._id));
+    }
+  };
+
+  const handleEdit = () => {
+    // 导航到 Assignment 编辑页面
+    navigate(`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`);
+  };
 
   return (
     <li className="wd-assignment-list-item list-group-item d-flex align-items-start p-3 border-start border-success">
-      {/* 左侧的8点图标 */}
+      {/* 左侧的 8 点图标 */}
       <BsGripVertical className="me-2 fs-3" />
 
       {/* 绿色记事板图标 */}
@@ -45,8 +59,16 @@ export default function AssignmentListItem(props: AssignmentListItemProps) {
       </div>
 
       {/* 右侧的操作图标 */}
-      <div className="float-end">
+      <div className="float-end d-flex align-items-center">
+        {/* 绿色勾图标 */}
         <GreenCheckmark />
+        {/* 操作按钮 */}
+        <button onClick={handleEdit} className="btn btn-sm btn-warning me-2">
+          Edit
+        </button>
+        <button onClick={handleDelete} className="btn btn-sm btn-danger">
+          Delete
+        </button>
         <IoEllipsisVertical className="fs-4 ms-2" />
       </div>
     </li>

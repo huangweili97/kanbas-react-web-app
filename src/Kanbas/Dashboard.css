@@ -22,11 +22,24 @@
 }
 
 /* 让卡片的高度自适应，确保按钮位置一致 */
+/* 保证卡片的高度一致，按钮在卡片底部 */
 .card {
     display: flex;
     flex-direction: column;
     height: 100%;
 }
+
+.card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 确保内容区域在上方 */
+}
+
+.d-flex.mt-auto {
+    margin-top: auto; /* 将按钮区域推到卡片底部 */
+}
+
 
 /* 固定图片高度，确保每个卡片图片大小一致 */
 .card-img-top {
@@ -35,14 +48,6 @@
     width: 100%;
 }
 
-/* 卡片主体的内容部分 */
-.card-body {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* 确保按钮位于卡片底部 */
-    min-height: 200px; /* 根据需要调整，确保卡片的最小高度一致 */
-}
 
 /* 确保按钮固定在卡片底部 */
 .btn {
