@@ -1,9 +1,32 @@
-import { Routes, Route } from "react-router-dom";
-import AssignmentEditor from "./Editor";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import Assignments from "./index";
+import AssignmentForm from "./AssignmentForm";
 
-// 在 Assignments 组件内
-<Routes>
-  <Route path="new" element={<AssignmentEditor />} />
-  <Route path=":assignmentId" element={<AssignmentEditor />} />
-</Routes>
 
+export default function AppRoutes() {
+  return (
+    <Router>
+      <Routes>
+        {/* 作业列表 */}
+        <Route
+          path="/Kanbas/Courses/:cid/Assignments"
+          element={<Assignments />}
+        />
+
+        {/* 创建新作业 */}
+        <Route
+          path="/Kanbas/Courses/:cid/Assignments/new"
+          element={<AssignmentForm mode="create" />}
+        />
+
+        {/* 编辑作业 */}
+        <Route
+          path="/Kanbas/Courses/:cid/Assignments/:assignmentId/edit"
+          element={<AssignmentForm mode="edit" />}
+        />
+
+      
+      </Routes>
+    </Router>
+  );
+}

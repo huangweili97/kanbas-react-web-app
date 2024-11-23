@@ -1,5 +1,8 @@
 import { useLocation } from "react-router";
 export default function TOC() {
+    // useLocation 是 React Router 提供的一个钩子，用来获取当前页面的路径信息
+    // 如果当前路径是 http://localhost:3000/#/Labs/Lab1，
+    // pathname 的值是 /Labs/Lab1
   const { pathname } = useLocation();
   return (
     <ul className="nav nav-pills" id="wd-toc">
@@ -12,6 +15,8 @@ export default function TOC() {
           className={`nav-link ${pathname.includes("Lab3") ? "active" : ""}`}>Lab 3</a></li>
        <li className="nav-item"><a id="wd-a4" href="#/Labs/Lab4"
           className={`nav-link ${pathname.includes("Lab4") ? "active" : ""}`}>Lab 4</a></li>
+      <li className="nav-item"><a id="wd-a5" href="#/Labs/Lab5"
+          className={`nav-link ${pathname.includes("Lab5") ? "active" : ""}`}>Lab 5</a></li>
       <li className="nav-item"><a id="wd-k" href="#/Kanbas" className="nav-link">Kanbas</a></li>
       <li className="nav-item"><a id="wd-github" href="https://github.com/huangweili97/kanbas-react-web-app.git" target="_blank"
           className="nav-link">My GitHub</a></li>

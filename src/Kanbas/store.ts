@@ -11,5 +11,9 @@ const store = configureStore({
     enrollmentReducer,
   },
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+
 export default store;
+
 
