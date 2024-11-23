@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:4000";
+const SERVER_URL = process.env.REACT_APP_REMOTE_SERVER || "http://localhost:4000";
+
 const ENROLLMENTS_API = `${SERVER_URL}/api/enrollments`;
 
 // Get all enrollments for a specific user
