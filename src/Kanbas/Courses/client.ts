@@ -10,7 +10,7 @@ export const fetchAllCourses = async () => {
  
 
 export const fetchCourseById = async (courseId: string) => {
-  const { data } = await axios.get(`${COURSES_API}/${courseId}`);
+  const { data } = await axiosWithCredentials.get(`${COURSES_API}/${courseId}`);
   return data;
 };
 
