@@ -6,10 +6,12 @@ import ModuleEditor from "./ModuleEditor";
 export default function ModulesControls({
   moduleName,
   setModuleName,
+  setModuleDescription,
   addModule,
 }: {
   moduleName: string;
   setModuleName: (title: string) => void;
+  setModuleDescription: (title: string) => void;
   addModule: () => void;
 }) {
   return (
@@ -104,6 +106,7 @@ export default function ModulesControls({
         dialogTitle="Add Module"
         moduleName={moduleName}
         setModuleName={setModuleName}
+        setModuleDescription={setModuleDescription}
         addModule={addModule}
       />
     </div>

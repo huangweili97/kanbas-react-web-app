@@ -7,6 +7,7 @@ import { IoEllipsisVertical } from "react-icons/io5";
 import { FaClipboard } from "react-icons/fa";
 import GreenCheckmark from "./GreenCheckmark";
 import * as assignmentsClient from "./cilent";
+import dayjs from "dayjs";
 
 interface AssignmentListItemProps {
   assignment: {
@@ -22,13 +23,18 @@ interface AssignmentListItemProps {
   cid: string;
 }
 
-export default function AssignmentListItem({ assignment, cid }: AssignmentListItemProps) {
+export default function AssignmentListItem({
+  assignment,
+  cid,
+}: AssignmentListItemProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   // 删除作业的逻辑
   const handleDelete = async () => {
-    const confirmed = window.confirm("Are you sure you want to delete this assignment?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this assignment?"
+    );
     if (confirmed) {
       try {
         await assignmentsClient.deleteAssignment(assignment._id);
@@ -43,9 +49,8 @@ export default function AssignmentListItem({ assignment, cid }: AssignmentListIt
 
   // 编辑作业的逻辑
   const handleEdit = () => {
-    const url = `/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`;
-    console.log("Navigating to:", url);
-    navigate(url);
+    // 动态跳转到编辑页面，并传递 assignmentId
+    navigate(`/Kanbas/Courses/${cid}/Assignments/${assignment._id}/edit`);
   };
 
   // 查看作业详情的逻辑
@@ -82,13 +87,13 @@ export default function AssignmentListItem({ assignment, cid }: AssignmentListIt
         {/* 作业信息 */}
         <p className="mb-1">
           <span className="text-danger">Available From:</span>{" "}
-          {assignment.availableFrom} |{" "}
+          {dayjs(assignment.availableFrom).format("YYYY/MM/DD")} at 12:00am |{" "} 
           <span className="text-danger">Available Until:</span>{" "}
-          {assignment.availableUntil}
+          {dayjs(assignment.availableUntil).format("YYYY/MM/DD")} at 11:59pm {" "} 
         </p>
         <p className="mb-0">
-          <strong>Due:</strong> {assignment.dueDate} |{" "}
-          <strong>{assignment.points}pts</strong>
+          <strong>Due:</strong> {dayjs(assignment.dueDate).format("YYYY/MM/DD")} at 11:59pm{" "}
+          | <strong>{assignment.points} pts</strong>
         </p>
       </div>
 

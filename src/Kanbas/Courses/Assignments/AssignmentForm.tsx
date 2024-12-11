@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addAssignment, updateAssignment } from "./reducer";
 import * as assignmentsClient from "./cilent";
+import * as coursesClient from "../client"; // 用于获取课程信息
+import dayjs from "dayjs";
 
 interface Assignment {
   _id?: string;
@@ -12,7 +14,7 @@ interface Assignment {
   dueDate: string;
   availableFrom: string;
   availableUntil: string;
-  course: string;
+  course: string; // `course` 保存的是 `course.number`
 }
 
 interface AssignmentFormProps {
@@ -20,79 +22,102 @@ interface AssignmentFormProps {
 }
 
 export default function AssignmentForm({ mode }: AssignmentFormProps) {
-  const { assignmentId, cid } = useParams<{ assignmentId: string; cid: string }>();
-  console.log("what is my url", useParams());
-
+  const { cid, assignmentId } = useParams<{
+    cid: string;
+    assignmentId?: string;
+  }>(); // 从 URL 获取参数
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [assignment, setAssignment] = useState<Assignment>({
-    course: cid || "",
+    course: "",
     title: "",
     description: "",
     points: 0,
-    dueDate: "",
-    availableFrom: "",
-    availableUntil: "",
+    dueDate: dayjs()
+      .add(7, "day")
+      .set("hour", 23)
+      .set("minute", 59)
+      .format("YYYY-MM-DD"),
+    availableFrom: dayjs().startOf("day").format("YYYY-MM-DD"),
+    availableUntil: dayjs()
+      .add(30, "day")
+      .set("hour", 23)
+      .set("minute", 59)
+      .format("YYYY-MM-DD"),
   });
-  const [loading, setLoading] = useState(mode === "edit");
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AssignmentForm loaded with", { mode, cid, assignmentId });
+    const fetchCourseAndAssignment = async () => {
+      try {
+        const course = await coursesClient.fetchCourseById(cid!);
+        if (course && course.number) {
+          setAssignment((prev) => ({ ...prev, course: course.number }));
 
-    const fetchAssignment = async () => {
-      if (mode === "edit") {
-        if (!assignmentId) {
-          alert("Invalid assignment ID. Redirecting to assignments list.");
-          navigate(`/Kanbas/Courses/${cid}/Assignments`);
-          return;
-        }
-
-        try {
-          const fetchedAssignment = await assignmentsClient.fetchAssignmentById(assignmentId);
-          if (fetchedAssignment) {
-            setAssignment(fetchedAssignment);
-          } else {
-            alert("Assignment not found. Redirecting to assignments list.");
-            navigate(`/Kanbas/Courses/${cid}/Assignments`);
+          if (mode === "edit" && assignmentId) {
+            const fetchedAssignment =
+              await assignmentsClient.fetchAssignmentById(assignmentId);
+            if (fetchedAssignment) {
+              setAssignment((prev) => ({
+                ...prev,
+                ...fetchedAssignment,
+                dueDate: dayjs(fetchedAssignment.dueDate).format("YYYY-MM-DD"), // 格式化日期
+                availableFrom: dayjs(fetchedAssignment.availableFrom).format(
+                  "YYYY-MM-DD"
+                ),
+                availableUntil: dayjs(fetchedAssignment.availableUntil).format(
+                  "YYYY-MM-DD"
+                ),
+              }));
+            }
           }
-        } catch (error) {
-          console.error("Failed to fetch assignment:", error);
-          alert("Failed to load assignment. Please try again.");
-        } finally {
-          setLoading(false);
         }
-      } else {
+      } catch (error) {
+        console.error("Failed to load course or assignment:", error);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchAssignment();
+    fetchCourseAndAssignment();
   }, [mode, assignmentId, cid, navigate]);
 
-  // useEffect(() => {
-  //   console.log("Current URL:", window.location.href); // 打印当前浏览器URL
-  //   console.log("Params from useParams:", { cid, assignmentId }); // 打印解析的参数
-  // }, [cid, assignmentId]);
-
-  // if (!assignmentId) {
-  //   console.error("Invalid assignmentId:", assignmentId);
-  //   return <div>Error: Invalid assignment ID</div>;
-  // }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setAssignment((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
     try {
+      const formattedAssignment = {
+        ...assignment,
+        dueDate: dayjs(assignment.dueDate)
+          .set("hour", 23)
+          .set("minute", 59)
+          .toISOString(),
+        availableFrom: dayjs(assignment.availableFrom)
+          .startOf("day")
+          .toISOString(),
+        availableUntil: dayjs(assignment.availableUntil)
+          .set("hour", 23)
+          .set("minute", 59)
+          .toISOString(),
+      };
+
       if (mode === "create") {
-        const createdAssignment = await assignmentsClient.createAssignment(assignment);
+        const createdAssignment = await assignmentsClient.createAssignment(
+          formattedAssignment
+        );
         dispatch(addAssignment(createdAssignment));
         alert("Assignment created successfully.");
-      } else {
-        const updatedAssignment = await assignmentsClient.updateAssignment(assignment);
+      } else if (assignmentId) {
+        const updatedAssignment = await assignmentsClient.updateAssignment(
+          formattedAssignment
+        );
         dispatch(updateAssignment(updatedAssignment));
         alert("Assignment updated successfully.");
       }
@@ -113,7 +138,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
       <form>
         {/* Title */}
         <div className="mb-3">
-          <label htmlFor="title" className="form-label">Title</label>
+          <label htmlFor="title" className="form-label">
+            Title
+          </label>
           <input
             type="text"
             id="title"
@@ -127,7 +154,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
 
         {/* Description */}
         <div className="mb-3">
-          <label htmlFor="description" className="form-label">Description</label>
+          <label htmlFor="description" className="form-label">
+            Description
+          </label>
           <textarea
             id="description"
             name="description"
@@ -140,7 +169,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
 
         {/* Points */}
         <div className="mb-3">
-          <label htmlFor="points" className="form-label">Points</label>
+          <label htmlFor="points" className="form-label">
+            Points
+          </label>
           <input
             type="number"
             id="points"
@@ -154,7 +185,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
 
         {/* Due Date */}
         <div className="mb-3">
-          <label htmlFor="dueDate" className="form-label">Due Date</label>
+          <label htmlFor="dueDate" className="form-label">
+            Due Date
+          </label>
           <input
             type="date"
             id="dueDate"
@@ -168,7 +201,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
 
         {/* Available From */}
         <div className="mb-3">
-          <label htmlFor="availableFrom" className="form-label">Available From</label>
+          <label htmlFor="availableFrom" className="form-label">
+            Available From
+          </label>
           <input
             type="date"
             id="availableFrom"
@@ -181,7 +216,9 @@ export default function AssignmentForm({ mode }: AssignmentFormProps) {
 
         {/* Available Until */}
         <div className="mb-3">
-          <label htmlFor="availableUntil" className="form-label">Available Until</label>
+          <label htmlFor="availableUntil" className="form-label">
+            Available Until
+          </label>
           <input
             type="date"
             id="availableUntil"

@@ -8,15 +8,36 @@ export default function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentUser } = useSelector((state: any) => state.accountReducer);
+
+
   const updateProfile = async () => {
-    const updatedProfile = await client.updateUser(profile);
-    dispatch(setCurrentUser(updatedProfile));
+    try {
+      const updatedProfile = await client.updateUser(profile); // 发送更新请求
+      const latestProfile = await client.profile(); // 再次从后端获取最新信息
+      dispatch(setCurrentUser(latestProfile)); // 更新 Redux 状态
+      setProfile(latestProfile); // 更新组件状态
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    }
+  };
+  
+
+  // const fetchProfile = () => {
+  //   if (!currentUser) return navigate("/Kanbas/Account/Signin");
+  //   setProfile(currentUser);
+  // };
+
+  const fetchProfile = async () => {
+    try {
+      const user = await client.profile(); // 从后端获取最新信息
+      setProfile(user);
+      dispatch(setCurrentUser(user));
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+      navigate("/Kanbas/Account/Signin");
+    }
   };
 
-  const fetchProfile = () => {
-    if (!currentUser) return navigate("/Kanbas/Account/Signin");
-    setProfile(currentUser);
-  };
   const signout = async () => {
     await client.signout();
     dispatch(setCurrentUser(null));

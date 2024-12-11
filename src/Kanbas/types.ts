@@ -1,7 +1,7 @@
 // types.ts
 
 export interface Course {
-    _id: string;
+    _id: any;
     name: string;
     number: string;
     startDate: string;
@@ -11,7 +11,7 @@ export interface Course {
   }
   
   export interface User {
-    _id: string;
+    _id: any;
     username: string;
     password: string;
     firstName: string;

@@ -8,20 +8,23 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import * as courseClient from "./Courses/client";
 import * as userClient from "./Account/client";
-import * as EnrollmentClient from "./Enrollment/client";
+
 
 import ProtectedRoute from "./Account/ProtectedRoute";
 import Session from "./Account/Session";
 import { useSelector, useDispatch } from "react-redux";
-import { setEnrollments } from "./Enrollment/reducer";
-import { RootState } from "./store";
 import { Course, User } from "./types"; // 导入共享类型
 
+
 export default function Kanbas() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const currentUser = useSelector(
-    (state: RootState) => state.accountReducer.currentUser
-  ) as User | null;
+ const { currentUser } = useSelector((state: any) => state.accountReducer);
+ const [courses, setCourses] = useState<any[]>([]);
+ const [enrolling, setEnrolling] = useState<boolean>(false);
+
+  // const [courses, setCourses] = useState<Course[]>([]);
+  // const currentUser = useSelector(
+  //   (state: RootState) => state.accountReducer.currentUser
+  // ) as User | null;
   const dispatch = useDispatch();
 
   const [course, setCourse] = useState<Course>({
@@ -33,22 +36,23 @@ export default function Kanbas() {
     description: "New Description",
   });
 
-  const addNewCourse = async () => {
+  const findCoursesForUser = async () => {
     try {
-      const newCourse = await userClient.createCourse(course);
-      setCourses([...courses, newCourse]);
-      setCourse({
-        _id: "1234",
-        name: "New Course",
-        number: "New Number",
-        startDate: "2023-09-10",
-        endDate: "2023-12-15",
-        description: "New Description",
-      });
+      let courses = await userClient.findCoursesForUser(currentUser._id);
+      // 过滤掉 null 项
+      courses = courses.filter((course: any) => course !== null);
+      setCourses(courses);
     } catch (error) {
-      console.error("Error adding new course:", error);
+      console.error(error);
     }
   };
+ 
+  const addNewCourse = async () => {
+    // const newCourse = await userClient.createCourse(course);
+    const newCourse = await courseClient.createCourse(course);
+    setCourses([...courses, newCourse]);
+  };
+ 
 
   const deleteCourse = async (courseId: string) => {
     try {
@@ -75,38 +79,72 @@ export default function Kanbas() {
       console.error("Error updating course:", error);
     }
   };
+  const updateEnrollment = async (courseId: string, enrolled: boolean) => {
+    if (enrolled) {
+      await userClient.enrollIntoCourse(currentUser._id, courseId);
+    } else {
+      await userClient.unenrollFromCourse(currentUser._id, courseId);
+    }
+    setCourses(
+      courses.map((course) => {
+        if (course._id === courseId) {
+          return { ...course, enrolled: enrolled };
+        } else {
+          return course;
+        }
+      })
+    );
+  };
 
   const fetchCourses = async () => {
     try {
       const allCourses = await courseClient.fetchAllCourses();
+      let enrolledCourses = await userClient.findCoursesForUser(
+        currentUser._id
+      );
 
-      let fetchedCourses = allCourses;
+      // 过滤掉 null 项
+      enrolledCourses = enrolledCourses.filter((course: any) => course !== null);
 
-      if (currentUser?.role === "STUDENT") {
-        const enrollmentsData = await EnrollmentClient.findEnrollmentsForUser(
-          currentUser._id
-        );
-        const enrolledCourseIds = enrollmentsData.map(
-          (enrollment: any) => enrollment.course
-        );
-
-        dispatch(setEnrollments(enrolledCourseIds));
-
-        // 如果只想显示已注册的课程，可以使用以下过滤
-        // fetchedCourses = allCourses.filter(course => enrolledCourseIds.includes(course._id));
-      }
-
-      setCourses(fetchedCourses);
+      const courses = allCourses.map((course: any) => {
+        if (enrolledCourses.find((c: any) => c._id === course._id)) {
+          return { ...course, enrolled: true };
+        } else {
+          return course;
+        }
+      });
+      setCourses(courses);
     } catch (error) {
-      console.error("Error fetching courses:", error);
+      console.error(error);
     }
   };
 
+  const fetchAllCourses = async () => {
+    try {
+      const allCourses = await courseClient.fetchAllCourses();
+       // 过滤掉无效的课程数据
+      const validCourses = allCourses.filter((course:any) => course !== null);
+      setCourses(allCourses); // 设置为所有课程
+    } catch (error) {
+      console.error("Error fetching all courses:", error);
+    }
+  };
+ 
+
   useEffect(() => {
     if (currentUser) {
-      fetchCourses();
+      if (currentUser.role === "FACULTY") {
+        fetchAllCourses(); // 如果是FACULTY，加载所有课程
+      } else if (currentUser.role === "STUDENT") {
+        if (enrolling) {
+          fetchCourses(); // 如果是STUDENT且切换到显示所有课程
+        } else {
+          findCoursesForUser(); // 如果是STUDENT显示已选课程
+        }
+      }
     }
-  }, [currentUser]);
+  }, [currentUser, enrolling]);
+ 
 
   return (
     <Session>
@@ -120,14 +158,10 @@ export default function Kanbas() {
               path="Dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard
-                    courses={courses}
-                    course={course}
-                    setCourse={setCourse}
-                    addNewCourse={addNewCourse}
-                    deleteCourse={deleteCourse}
-                    updateCourse={updateCourse}
-                  />
+                  <Dashboard courses={courses} course={course} setCourse={setCourse}
+              addNewCourse={addNewCourse} deleteCourse={deleteCourse} updateCourse={updateCourse}
+              enrolling={enrolling} setEnrolling={setEnrolling} updateEnrollment={updateEnrollment}/>
+
                 </ProtectedRoute>
               }
             />
